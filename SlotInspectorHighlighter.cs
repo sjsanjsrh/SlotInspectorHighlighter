@@ -18,7 +18,7 @@ namespace SlotInspectorHighlighter
         public override string Name => "SlotInspectorHighlighter";
         public override string Author => "Sinduy";
         public override string Version => FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
-        public override string Link => "";
+        public override string Link => "https://github.com/sjsanjsrh/SlotInspectorHighlighter";
         public static readonly string DOMAIN_NAME = "com.Sinduy.SlotInspectorHighlighter";
 
         [AutoRegisterConfigKey]
