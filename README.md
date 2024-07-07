@@ -1,6 +1,7 @@
 # SlotInspectorHighlighter
 
 A [ResoniteModLoader](https://github.com/resonite-modding-group/ResoniteModLoader/) mod for [Resonite](https://resonite.com/). Adds a highlight to the hierarchy interface in the inspector to show which slot is currently being selected.
+![2024-07-07 01 59 00](https://github.com/sjsanjsrh/SlotInspectorHighlighter/assets/16241081/7a585021-7683-4abd-9771-3268e3969c62)
 
 ## Installation
 1. Install [ResoniteModLoader](https://github.com/resonite-modding-group/ResoniteModLoader/).
