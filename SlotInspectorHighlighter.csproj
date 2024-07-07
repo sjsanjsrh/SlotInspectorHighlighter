@@ -56,8 +56,15 @@
     <Compile Include="SlotInspectorHighlighter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="LICENSE.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="README.md" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy "$(TargetDir)\$(TargetFileName)" "C:\Program Files (x86)\Steam\steamapps\common\Resonite\rml_mods"</PostBuildEvent>
+    <PostBuildEvent>copy "$(TargetDir)\$(TargetFileName)" "C:\Program Files (x86)\Steam\steamapps\common\Resonite\rml_mods"
+certutil -hashfile "$(TargetDir)\$(TargetFileName)" sha256</PostBuildEvent>
   </PropertyGroup>
 </Project>
