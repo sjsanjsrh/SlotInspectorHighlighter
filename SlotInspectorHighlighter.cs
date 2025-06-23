@@ -26,7 +26,7 @@ namespace SlotInspectorHighlighter
             new ModConfigurationKey<bool>("enabled", "Should the mod be enabled", () => true);
         [AutoRegisterConfigKey]
         private static readonly ModConfigurationKey<colorX> hightlightColor =
-            new ModConfigurationKey<colorX>("highlightColor", "Color of the highlighter", () => new colorX(1, 1, 1, 0.01f));
+            new ModConfigurationKey<colorX>("highlightColor", "Color of the highlighter", () => new colorX(0, 0.85f, 0.95f, 0.1f));
 
         private static ModConfiguration Config;
 
