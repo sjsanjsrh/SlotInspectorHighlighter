@@ -1,15 +1,17 @@
-﻿using FrooxEngine;
+﻿using Elements.Core;
+using FrooxEngine;
 using FrooxEngine.UIX;
-using Elements.Core;
+using HarmonyLib;
 using ResoniteModLoader;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Remoting.Contexts;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using HarmonyLib;
 
 namespace SlotInspectorHighlighter
 {
@@ -25,14 +27,19 @@ namespace SlotInspectorHighlighter
         private static readonly ModConfigurationKey<bool> enabled =
             new ModConfigurationKey<bool>("enabled", "Should the mod be enabled", () => true);
         [AutoRegisterConfigKey]
+        private static readonly ModConfigurationKey<bool> localOnly =
+            new ModConfigurationKey<bool>("localOnly", "Highlight only inspector element allocated by the local user", () => true);
+        [AutoRegisterConfigKey]
         private static readonly ModConfigurationKey<colorX> hightlightColor =
             new ModConfigurationKey<colorX>("highlightColor", "Color of the highlighter", () => new colorX(0, 0.85f, 0.95f, 0.1f));
 
         private static ModConfiguration Config;
 
         public static bool Enabled => Config.GetValue(enabled);
+        public static bool LocalOnly => Config.GetValue(localOnly);
         public static colorX HighlightColor => Config.GetValue(hightlightColor);
         public static readonly String HIGHLITER_SLOT_NAME = "Highlighter";
+
 
         public override void OnEngineInit()
         {
@@ -42,7 +49,6 @@ namespace SlotInspectorHighlighter
         }
     }
 
-
     [HarmonyPatch(typeof(SlotInspector))]
     class SlotInspectorHighlighterPatch
     {
@@ -51,6 +57,20 @@ namespace SlotInspectorHighlighter
         static void UpdateTextPostfix(SlotInspector __instance, Slot ____setupRoot, RelayRef<SyncRef<Slot>> ____selectionReference, SyncRef<Text> ____slotNameText)
         {
             if (!SlotInspectorHighlighter.Enabled) { return; }
+            if (SlotInspectorHighlighter.LocalOnly)
+            {
+                SceneInspector sceneInspector = __instance.Slot.GetComponentInParents<SceneInspector>();
+                User allocatedUser = GetAllocatingUser(sceneInspector);
+
+                if (allocatedUser != null && allocatedUser != __instance.LocalUser)
+                {
+                    // Don't highlight slots allocated by other users
+                    return;
+                }
+            }
+
+            // Get or create highlighter slot
+            Slot selectedSlot = ____selectionReference.Target?.Target;
             Slot textSlot = ____slotNameText.Target.Slot;
             Slot hlSlot = textSlot.FindChild(SlotInspectorHighlighter.HIGHLITER_SLOT_NAME);
             if (hlSlot == null)
@@ -60,7 +80,27 @@ namespace SlotInspectorHighlighter
                 hlImg.Slot.Name = SlotInspectorHighlighter.HIGHLITER_SLOT_NAME;
                 hlSlot = hlImg.Slot;
             }
-            hlSlot.ActiveSelf = ____selectionReference.Target?.Target == ____setupRoot;
+            hlSlot.ActiveSelf = selectedSlot == ____setupRoot;
+        }
+
+        private static User GetAllocatingUser(IWorldElement worldElement)
+        {
+            if (worldElement == null)
+                return null;
+
+            World world = worldElement.World;
+            if (world == null)
+                return null;
+
+            ulong position;
+            byte userId;
+            worldElement.ReferenceID.ExtractIDs(out position, out userId);
+
+            User userByAllocationId = world.GetUserByAllocationID(userId);
+            if (userByAllocationId == null)
+                return null;
+
+            return position < userByAllocationId.AllocationIDStart ? null : userByAllocationId;
         }
     }
 }
