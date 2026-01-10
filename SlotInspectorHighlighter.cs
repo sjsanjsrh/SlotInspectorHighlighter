@@ -56,23 +56,25 @@ namespace SlotInspectorHighlighter
         [HarmonyPostfix]
         static void UpdateTextPostfix(SlotInspector __instance, Slot ____setupRoot, RelayRef<SyncRef<Slot>> ____selectionReference, SyncRef<Text> ____slotNameText)
         {
-            if (!SlotInspectorHighlighter.Enabled) { return; }
+            bool isLocalUserFlag = true;
             if (SlotInspectorHighlighter.LocalOnly)
             {
                 SceneInspector sceneInspector = __instance.Slot.GetComponentInParents<SceneInspector>();
                 User allocatedUser = GetAllocatingUser(sceneInspector);
-
-                if (allocatedUser != null && allocatedUser != __instance.LocalUser)
-                {
-                    // Don't highlight slots allocated by other users
-                    return;
-                }
+                isLocalUserFlag = allocatedUser == __instance.LocalUser;
             }
 
             // Get or create highlighter slot
             Slot selectedSlot = ____selectionReference.Target?.Target;
             Slot textSlot = ____slotNameText.Target.Slot;
             Slot hlSlot = textSlot.FindChild(SlotInspectorHighlighter.HIGHLITER_SLOT_NAME);
+            if (!(SlotInspectorHighlighter.Enabled && isLocalUserFlag))
+            {
+                if (hlSlot != null)
+                { hlSlot.Destroy(); }
+                return;
+            }
+            
             if (hlSlot == null)
             {
                 UIBuilder builder = new UIBuilder(textSlot);
