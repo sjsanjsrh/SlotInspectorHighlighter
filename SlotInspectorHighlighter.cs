@@ -17,10 +17,10 @@ namespace SlotInspectorHighlighter
     public class SlotInspectorHighlighter : ResoniteMod
     {
         internal const string DOMAIN_NAME = "com.Sinduy.SlotInspectorHighlighter";
-        internal const string VERSION = "1.0.5";
+        internal const string VERSION = "1.0.6";
         public override string Name => "SlotInspectorHighlighter";
         public override string Author => "Sinduy";
-        public override string Version => FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
+        public override string Version => VERSION;
         public override string Link => "https://github.com/sjsanjsrh/SlotInspectorHighlighter";
 
         [AutoRegisterConfigKey]
